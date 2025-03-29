@@ -56,11 +56,24 @@ git clone https://github.com/butadpj/nvim-config.git "${env:LOCALAPPDATA}\nvim"
 
 #### 2. Start Neovim
 
-Start Neovim
-
 ```sh
 nvim
 ```
 
-That's it! Lazy will install all the plugins you have. Use `:Lazy` to view
-the current plugin status. Hit `q` to close the window.
+That's it! Lazy UI will show up and installs all the plugins you have. 
+
+Use `:Lazy` to view the current plugin status. Hit `q` to close the window.
+
+Use `:Mason` to view installed LSP's, Linters, and other tools. Hit `q` to close the window.
+
+Use `:MarkdownPreview` to open a browser-based Markdown previewer.
+
+## Troubleshooting
+
+- #### Lazy UI not showing up when I Neovim
+    - You probably have a pre-existing Neovim configuration. Delete it first, with: 
+        ```bash
+        rm -rf ~/.local/share/nvim/
+        ```
+    - Then re-open Neovim
+
