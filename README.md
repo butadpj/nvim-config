@@ -1,6 +1,6 @@
 # My Neovim Configuration
 
-_"A modern Neovim configuration for web devs"_
+_"A Neovim configuration of someone who's a huge fan of VS Code"_
 
 
 ## Features
