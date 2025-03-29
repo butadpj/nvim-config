@@ -25,7 +25,13 @@ require("lazy").setup({
 	require("plugins.telescope"), -- File search
 	require("plugins.which-key"), -- Key mapping docs
 	require("plugins.todo-comments"), -- Highlights TODO comments
+	require("plugins.markdown-preview"), -- Previewing .md files
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
+	-- Multi cursor selection (Ctrl+D in VsCode)
+	{
+		"mg979/vim-visual-multi",
+		event = "VeryLazy",
+	},
 	ui = {
 		-- If you are using a Nerd Font: set icons to an empty table which will use the
 		-- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
