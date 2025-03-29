@@ -8,5 +8,6 @@ return {
 			topdelete = { text = "‾" },
 			changedelete = { text = "~" },
 		},
+		current_line_blame = true, -- Toggle to true if you want inline blame
 	},
 }

@@ -19,7 +19,8 @@ require("lazy").setup({
 	require("plugins.neo-tree"), -- File explorer
 	require("plugins.autopairs"), -- Blocks auto pair
 	require("plugins.treesitter"), -- Advance syntax highlighting
-	require("plugins.gitsigns"), -- Git signs
+	require("plugins.gitsigns"), -- Git signs for code lines
+	require("plugins.diffview"), -- Git diff view
 	require("plugins.tokyonight"), -- Theme (from VS Code's TokyoNight)
 	require("plugins.telescope"), -- File search
 	require("plugins.which-key"), -- Key mapping docs
