@@ -41,6 +41,7 @@ return { -- Autoformat
 			typescriptreact = { "prettier", stop_after_first = true },
 			css = { "prettier", stop_after_first = true },
 			php = { "pretty-php", "php-cs-fixer", stop_after_first = true },
+			astro = { "prettier", stop_after_first = true },
 		},
 		formatters = {
 			["php-cs-fixer"] = {
