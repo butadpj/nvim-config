@@ -177,7 +177,7 @@ return {
 				on_attach = on_attach,
 				root_dir = function(fname)
 					-- Consider Deno projects that uses package.json
-					-- Only attach ts_ls on regular Deno projects and TS projects
+					-- Only attach ts_ls on non-Deno projects
 					local package_root = nvim_lsp.util.root_pattern("package.json")(fname)
 					local deno_root = nvim_lsp.util.root_pattern({ "deno.json", "deno.jsonc" })(fname)
 
