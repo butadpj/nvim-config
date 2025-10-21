@@ -26,6 +26,7 @@ require("lazy").setup({
 	require("plugins.which-key"), -- Key mapping docs
 	require("plugins.todo-comments"), -- Highlights TODO comments
 	require("plugins.markdown-preview"), -- Previewing .md files
+	require("plugins.dropbar"), -- IDE-like winbar with drop-down menus
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	-- Multi cursor selection (Ctrl+D in VsCode)
 	{
