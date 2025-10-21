@@ -162,132 +162,112 @@ return {
 		--  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
 		--  - settings (table): Override the default settings passed when initializing the server.
 		--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-		local on_attach = function(client, bufnr)
-			-- Example: set up buffer-local keymaps here
-			local opts = { noremap = true, silent = true }
-			vim.api.nvim_buf_set_keymap(bufnr, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-			-- More keybindings and logic as needed
-		end
 
-		local nvim_lsp = require("lspconfig")
-
-		local servers = {
-			clangd = {},
-			ts_ls = {
-				on_attach = on_attach,
-				root_dir = function(fname)
-					-- Consider Deno projects that uses package.json
-					-- Only attach ts_ls on non-Deno projects
-					local package_root = nvim_lsp.util.root_pattern("package.json")(fname)
-					local deno_root = nvim_lsp.util.root_pattern({ "deno.json", "deno.jsonc" })(fname)
-
-					if package_root and not deno_root then
-						return package_root
-					end
-				end,
-				single_file_support = false,
-			},
-			denols = {
-				on_attach = on_attach,
-				root_dir = nvim_lsp.util.root_pattern({ "deno.json", "deno.jsonc" }),
-				single_file_support = false,
-				settings = {},
-			},
-			cssls = {},
-			eslint = {},
-			astro = {},
-			lua_ls = {
-				settings = {
-					Lua = {
-						completion = {
-							callSnippet = "Replace",
-						},
-						-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-						diagnostics = {
-							disable = { "missing-fields" },
-							globals = { "vim" },
-						},
-					},
-				},
-			},
-			tailwindcss = {
-				-- Enable autocompletion inside cva()
-				settings = {
-					tailwindCSS = {
-						experimental = {
-							classRegex = {
-								{ "cva\\(((?:[^()]|\\([^()]*\\))*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
-								{ "cx\\(((?:[^()]|\\([^()]*\\))*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-							},
-						},
-					},
-				},
-				-- exclude a filetype from the default_config
-				filetypes_exclude = { "markdown" },
-				-- add additional filetypes to the default_config
-				filetypes_include = {},
-				-- to fully override the default_config, change the below
-				-- filetypes = {}
-				setup = function(_, opts)
-					local tw = LazyVim.lsp.get_raw_config("tailwindcss")
-					opts.filetypes = opts.filetypes or {}
-
-					-- Add default filetypes
-					vim.list_extend(opts.filetypes, tw.default_config.filetypes)
-
-					-- Remove excluded filetypes
-					--- @param ft string
-					opts.filetypes = vim.tbl_filter(function(ft)
-						return not vim.tbl_contains(opts.filetypes_exclude or {}, ft)
-					end, opts.filetypes)
-
-					-- Additional settings for Phoenix projects
-					opts.settings = {
-						tailwindCSS = {
-							includeLanguages = {
-								elixir = "html-eex",
-								eelixir = "html-eex",
-								heex = "html-eex",
-							},
-						},
-					}
-
-					-- Add additional filetypes
-					vim.list_extend(opts.filetypes, opts.filetypes_include or {})
-				end,
-			},
+		-- Define servers with custom configurations
+		-- Simple servers that don't need custom config
+		local simple_servers = {
+			"clangd",
+			"cssls",
+			"eslint",
+			"astro",
 		}
 
-		-- Ensure the servers and tools above are installed
+		-- Configure lua_ls with Neovim-specific settings
+		vim.lsp.config("lua_ls", {
+			settings = {
+				Lua = {
+					completion = {
+						callSnippet = "Replace",
+					},
+					diagnostics = {
+						disable = { "missing-fields" },
+						globals = { "vim" },
+					},
+				},
+			},
+			capabilities = capabilities,
+		})
+
+		-- Configure tailwindcss with custom class regex patterns
+		vim.lsp.config("tailwindcss", {
+			settings = {
+				tailwindCSS = {
+					experimental = {
+						classRegex = {
+							{ "cva\\(((?:[^()]|\\([^()]*\\))*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+							{ "cx\\(((?:[^()]|\\([^()]*\\))*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
+						},
+					},
+					includeLanguages = {
+						elixir = "html-eex",
+						eelixir = "html-eex",
+						heex = "html-eex",
+					},
+				},
+			},
+			capabilities = capabilities,
+		})
+
+		local function is_deno_project()
+			return vim.fs.root(0, { "deno.json", "deno.jsonc" }) ~= nil
+		end
+
+		local function is_node_project()
+			return vim.fs.root(0, { "package.json" }) ~= nil
+		end
+
+		vim.lsp.config("denols", {
+			on_attach = on_attach,
+			root_markers = { "deno.json", "deno.jsonc" },
+			settings = {
+				deno = {
+					enable = is_deno_project(),
+				},
+			},
+			capabilities = capabilities,
+		})
+
+		vim.lsp.config("ts_ls", {
+			on_attach = on_attach,
+			root_markers = { "package.json" },
+			settings = {
+				enabled = false,
+			},
+			capabilities = capabilities,
+		})
+
+		-- Ensure the servers and tools are installed via Mason
 		--
 		-- To check the current status of installed tools and/or manually install
-		-- other tools, you can run
+		-- other tools, you can run:
 		--    :Mason
 		--
 		-- You can press `g?` for help in this menu.
-		--
-		-- `mason` had to be setup earlier: to configure its options see the
-		-- `dependencies` table for `nvim-lspconfig` above.
-		--
-		-- You can add other tools here that you want Mason to install
-		-- for you, so that they are available from within Neovim.
-		local ensure_installed = vim.tbl_keys(servers or {})
-		vim.list_extend(ensure_installed, {
+		local all_servers = vim.list_extend(vim.deepcopy(simple_servers), {
+			"lua_ls",
+			"tailwindcss",
+			"denols",
+			"ts_ls",
+		})
+
+		vim.list_extend(all_servers, {
 			"stylua", -- Used to format Lua code
 		})
-		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
+		require("mason-tool-installer").setup({ ensure_installed = all_servers })
+
+		-- Set up mason-lspconfig to install servers
+		-- Note: We don't use handlers here anymore since we're using vim.lsp.enable()
 		require("mason-lspconfig").setup({
-			handlers = {
-				function(server_name)
-					local server = servers[server_name] or {}
-					-- This handles overriding only values explicitly passed
-					-- by the server configuration above. Useful when disabling
-					-- certain features of an LSP (for example, turning off formatting for ts_ls)
-					server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-					nvim_lsp[server_name].setup(server)
-				end,
-			},
+			ensure_installed = vim.tbl_filter(function(server)
+				return server ~= "stylua" -- Filter out non-LSP tools
+			end, all_servers),
 		})
+
+		-- Enable all configured language servers
+		-- This replaces the old require('lspconfig').server.setup() pattern
+		for _, server in ipairs(all_servers) do
+			vim.lsp.enable(server)
+		end
 	end,
 }
