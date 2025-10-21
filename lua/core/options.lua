@@ -64,7 +64,7 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
-vim.opt.cmdheight = 2
+vim.opt.cmdheight = 1
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
