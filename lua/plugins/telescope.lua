@@ -91,9 +91,15 @@ return { -- Fuzzy Finder (files, lsp, etc)
 		vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
 		vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
 		vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
-		vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+		vim.keymap.set("n", "<leader>s,", builtin.oldfiles, { desc = "[S]earch Recent Files (global)" })
+		vim.keymap.set("n", "<leader>s.", function()
+			local root = (vim.uv or vim.loop).cwd() or vim.fn.getcwd()
+			builtin.oldfiles({
+				cwd = root,
+				only_cwd = true,
+			})
+		end, { desc = "[S]earch Recent Files (current working directory)" })
 		vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
-		vim.keymap.set("n", "<leader>fg", ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>")
 
 		-- Slightly advanced example of overriding default behavior and theme
 		vim.keymap.set("n", "<leader>/", function()
@@ -112,6 +118,56 @@ return { -- Fuzzy Finder (files, lsp, etc)
 				prompt_title = "Live Grep in Open Files",
 			})
 		end, { desc = "[S]earch [/] in Open Files" })
+
+		-- Live grep w/ args extension configuration START --
+		local conf = require("telescope.config").values
+
+		local function extend_vimgrep_args(extra_args)
+			local args = vim.deepcopy(conf.vimgrep_arguments)
+			if extra_args then
+				for _, arg in ipairs(extra_args) do
+					table.insert(args, arg)
+				end
+			end
+			return args
+		end
+
+		vim.keymap.set("n", "<leader>fgg", function()
+			require("telescope").extensions.live_grep_args.live_grep_args()
+		end, { desc = "Live grep with args" })
+
+		vim.keymap.set("n", "<leader>fgw", function()
+			require("telescope").extensions.live_grep_args.live_grep_args({
+				vimgrep_arguments = extend_vimgrep_args({ "-w" }),
+			})
+		end, { desc = "Live grep with args (Match whole word)" })
+
+		vim.keymap.set("n", "<leader>fgs", function()
+			require("telescope").extensions.live_grep_args.live_grep_args({
+				vimgrep_arguments = extend_vimgrep_args({ "-w", "-s" }),
+			})
+		end, { desc = "Live grep with args (Match whole word & case)" })
+
+		vim.keymap.set("n", "<leader>fcc", function()
+			require("telescope").extensions.live_grep_args.live_grep_args({
+				search_dirs = { vim.fn.expand("%:p") },
+			})
+		end, { desc = "Live Grep current file with args" })
+
+		vim.keymap.set("n", "<leader>fcw", function()
+			require("telescope").extensions.live_grep_args.live_grep_args({
+				search_dirs = { vim.fn.expand("%:p") },
+				vimgrep_arguments = extend_vimgrep_args({ "-w" }),
+			})
+		end, { desc = "Live Grep current file with args (Match whole word)" })
+
+		vim.keymap.set("n", "<leader>fcs", function()
+			require("telescope").extensions.live_grep_args.live_grep_args({
+				search_dirs = { vim.fn.expand("%:p") },
+				vimgrep_arguments = extend_vimgrep_args({ "-w", "-s" }),
+			})
+		end, { desc = "Live Grep current file with args (Match whole word & case)" })
+		-- Live grep args extension configuration END --
 
 		-- Shortcut for searching your Neovim configuration files
 		vim.keymap.set("n", "<leader>sn", function()
