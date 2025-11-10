@@ -13,6 +13,8 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	require("core.lspconfig"), -- Main LSP Config
+	-- require("themes.tokyonight"), -- Theme (from VS Code's TokyoNight)
+	require("themes.ondarkpro"), -- Theme (Atom's iconic One Dark theme)
 	require("plugins.lazydev"), -- Plugin manager
 	require("plugins.conform"), -- Autoformatting
 	require("plugins.nvim-cmp"), -- Autocompletion
@@ -21,7 +23,6 @@ require("lazy").setup({
 	require("plugins.treesitter"), -- Advance syntax highlighting
 	require("plugins.gitsigns"), -- Git signs for code lines
 	require("plugins.diffview"), -- Git diff view
-	require("plugins.tokyonight"), -- Theme (from VS Code's TokyoNight)
 	require("plugins.telescope"), -- File search
 	require("plugins.which-key"), -- Key mapping docs
 	require("plugins.todo-comments"), -- Highlights TODO comments
