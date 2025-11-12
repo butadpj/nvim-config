@@ -13,6 +13,8 @@ _"A Neovim configuration of someone who's a huge fan of VS Code—now tuned for 
 - Conform keeps files formatted on save (Prettier, Stylua, PHP-CS-Fixer); `<A-F>` gives you the classic VS Code “format document” shortcut whenever you need it.
 - Dropbar winbar menus, Neo-tree, Telescope, Diffview, Markdown previews, and TODO highlights provide the creature comforts that usually send people back to VS Code.
 
+> **Transparency note:** Transparent background is enabled by default when using the OneDarkPro theme. If your terminal emulator also uses transparency, keep its opacity low (around 5–10%) so foreground text maintains comfortable contrast.
+
 ## Daily Dev Workflows
 - **File explorer** — `<C-b>` (from `lua/plugins/neo-tree.lua`) toggles Neo-tree, `<CR>` opens the focused file, `s` creates a split, `r` renames, and tapping `<C-b>` again closes the drawer. Use `<C-b>` inside any buffer to reveal the current file instantly.
 - **Search the current project** — Telescope keymaps in `lua/plugins/telescope.lua` keep scope tight: `<leader>s.` opens “search old files” limited to the current working directory, `<leader>sf` finds files, `<leader>sg` live-greps from project root, and `<leader><leader>` lists active buffers.
