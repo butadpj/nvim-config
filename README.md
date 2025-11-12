@@ -2,6 +2,9 @@
 
 _"A Neovim configuration of someone who's a huge fan of VS Code—now tuned for pure DX delight!"_
 
+<img width="1915" height="1030" alt="image" src="https://github.com/user-attachments/assets/05874406-f8ae-405d-b183-3d300bdcfe62" />
+
+
 ## Why This Setup Rocks
 - Onedark Pro theme, transparent panes, and Nerd Font icons make every buffer look like a high-end editor without sacrificing startup speed.
 - Mason auto-installs all the usual suspects (TypeScript, Deno, Astro, Lua, Tailwind, ESLint, etc.) and wires them into `nvim-lspconfig` automatically.
