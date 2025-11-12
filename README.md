@@ -2,7 +2,9 @@
 
 _"A Neovim configuration of someone who's a huge fan of VS Code—now tuned for pure DX delight!"_
 
-<img width="1915" height="1030" alt="image" src="https://github.com/user-attachments/assets/05874406-f8ae-405d-b183-3d300bdcfe62" />
+<img width="1916" height="1029" alt="image" src="https://github.com/user-attachments/assets/28358212-0820-43d8-9770-340d0f39a5bb" />
+<img width="1918" height="1032" alt="image" src="https://github.com/user-attachments/assets/2ab2fb31-8521-4e7f-b3fd-972396c4c384" />
+
 
 
 ## Why This Setup Rocks
