@@ -163,6 +163,36 @@ return {
 		--  - settings (table): Override the default settings passed when initializing the server.
 		--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 
+		-- Collect formatter binaries from Conform so Mason can install them automatically.
+		local function collect_conform_formatters()
+			local ok, conform_spec = pcall(require, "plugins.conform")
+			if not ok or type(conform_spec.opts) ~= "table" then
+				return {}
+			end
+
+			local names, seen = {}, {}
+			local function add(name)
+				if type(name) == "string" and not seen[name] then
+					table.insert(names, name)
+					seen[name] = true
+				end
+			end
+
+			for _, formatter_list in pairs(conform_spec.opts.formatters_by_ft or {}) do
+				if type(formatter_list) == "table" then
+					for _, name in ipairs(formatter_list) do
+						add(name)
+					end
+				end
+			end
+
+			for name in pairs(conform_spec.opts.formatters or {}) do
+				add(name)
+			end
+
+			return names
+		end
+
 		-- Simple servers that don't need custom config
 		local simple_servers = {
 			"clangd",
@@ -170,12 +200,24 @@ return {
 			"eslint",
 			"astro",
 			"ts_ls",
-			"gopls",
 			"denols",
 		}
 
 		-- Define servers with custom configurations
 		--
+
+		-- Go
+		vim.lsp.config("gopls", {
+			settings = {
+				gopls = {
+					-- gofumpt installed by Conform has issues so..
+					-- Enabling gofumpt here instead
+					gofumpt = true,
+					usePlaceholders = true,
+				},
+			},
+		})
+
 		-- Configure lua_ls with Neovim-specific settings
 		vim.lsp.config("lua_ls", {
 			settings = {
@@ -219,29 +261,26 @@ return {
 		--    :Mason
 		--
 		-- You can press `g?` for help in this menu.
-		local all_servers = vim.list_extend(vim.deepcopy(simple_servers), {
+		local lsp_servers = vim.list_extend(vim.deepcopy(simple_servers), {
 			"lua_ls",
 			"tailwindcss",
+			"gopls",
 		})
 
-		vim.list_extend(all_servers, {
-			-- Add non-LSP installations here (i.e. Formatters)
-			"stylua", -- Lua code formatter
-		})
+		local formatter_tools = collect_conform_formatters()
+		local tools_to_install = vim.list_extend(vim.deepcopy(lsp_servers), formatter_tools)
 
-		require("mason-tool-installer").setup({ ensure_installed = all_servers })
+		require("mason-tool-installer").setup({ ensure_installed = tools_to_install })
 
 		-- Set up mason-lspconfig to install servers
 		-- Note: We don't use handlers here anymore since we're using vim.lsp.enable()
 		require("mason-lspconfig").setup({
-			ensure_installed = vim.tbl_filter(function(server)
-				return server ~= "stylua" -- Filter out non-LSP tools
-			end, all_servers),
+			ensure_installed = lsp_servers,
 		})
 
 		-- Enable all configured language servers
 		-- This replaces the old require('lspconfig').server.setup() pattern
-		for _, server in ipairs(all_servers) do
+		for _, server in ipairs(lsp_servers) do
 			vim.lsp.enable(server)
 		end
 
