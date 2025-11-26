@@ -163,15 +163,19 @@ return {
 		--  - settings (table): Override the default settings passed when initializing the server.
 		--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 
-		-- Define servers with custom configurations
 		-- Simple servers that don't need custom config
 		local simple_servers = {
 			"clangd",
 			"cssls",
 			"eslint",
 			"astro",
+			"ts_ls",
+			"gopls",
+			"denols",
 		}
 
+		-- Define servers with custom configurations
+		--
 		-- Configure lua_ls with Neovim-specific settings
 		vim.lsp.config("lua_ls", {
 			settings = {
@@ -208,34 +212,6 @@ return {
 			capabilities = capabilities,
 		})
 
-		local function is_deno_project()
-			return vim.fs.root(0, { "deno.json", "deno.jsonc" }) ~= nil
-		end
-
-		local function is_node_project()
-			return vim.fs.root(0, { "package.json" }) ~= nil
-		end
-
-		vim.lsp.config("denols", {
-			on_attach = on_attach,
-			root_markers = { "deno.json", "deno.jsonc" },
-			settings = {
-				deno = {
-					enable = is_deno_project(),
-				},
-			},
-			capabilities = capabilities,
-		})
-
-		vim.lsp.config("ts_ls", {
-			on_attach = on_attach,
-			root_markers = { "package.json" },
-			settings = {
-				enabled = false,
-			},
-			capabilities = capabilities,
-		})
-
 		-- Ensure the servers and tools are installed via Mason
 		--
 		-- To check the current status of installed tools and/or manually install
@@ -246,12 +222,11 @@ return {
 		local all_servers = vim.list_extend(vim.deepcopy(simple_servers), {
 			"lua_ls",
 			"tailwindcss",
-			"denols",
-			"ts_ls",
 		})
 
 		vim.list_extend(all_servers, {
-			"stylua", -- Used to format Lua code
+			-- Add non-LSP installations here (i.e. Formatters)
+			"stylua", -- Lua code formatter
 		})
 
 		require("mason-tool-installer").setup({ ensure_installed = all_servers })
@@ -268,6 +243,19 @@ return {
 		-- This replaces the old require('lspconfig').server.setup() pattern
 		for _, server in ipairs(all_servers) do
 			vim.lsp.enable(server)
+		end
+
+		local function is_deno_project()
+			return vim.fs.root(0, { "deno.json", "deno.jsonc" }) ~= nil
+		end
+
+		-- Avoid conflict with Deno and TypeScript project by only enabling either of two..
+		if is_deno_project() then
+			vim.lsp.enable("denols", true)
+			vim.lsp.enable("ts_ls", false)
+		else
+			vim.lsp.enable("denols", false)
+			vim.lsp.enable("ts_ls", true)
 		end
 	end,
 }
