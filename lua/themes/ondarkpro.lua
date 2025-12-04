@@ -96,7 +96,7 @@ return { -- You can easily change to a different colorscheme.
 			},
 
 			options = {
-				cursorline = false, -- Use cursorline highlighting?
+				cursorline = true, -- Use cursorline highlighting?
 				transparency = true, -- Use a transparent background?
 				terminal_colors = true, -- Use the theme's colors for Neovim's :terminal?
 				lualine_transparency = false, -- Center bar transparency?
@@ -105,6 +105,7 @@ return { -- You can easily change to a different colorscheme.
 		})
 
 		vim.cmd("colorscheme onedark_dark")
+		-- vim.cmd("colorscheme onelight")
 
 		-- No need for this as Onedark supports transparent background : ))
 		vim.cmd([[
