@@ -104,8 +104,8 @@ return { -- You can easily change to a different colorscheme.
 			},
 		})
 
-		vim.cmd("colorscheme onedark_dark")
-		-- vim.cmd("colorscheme onelight")
+		-- vim.cmd("colorscheme onedark_dark")
+		vim.cmd("colorscheme onelight")
 
 		-- No need for this as Onedark supports transparent background : ))
 		vim.cmd([[
