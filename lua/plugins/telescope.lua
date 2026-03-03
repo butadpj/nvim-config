@@ -93,6 +93,26 @@ return { -- Fuzzy Finder (files, lsp, etc)
 			return args
 		end
 
+		local function extend_unignored_vimgrep_args(extra_args)
+			local args = {
+				"--hidden",
+				"--no-ignore",
+				"--glob=!.git/*",
+				"--glob=!**/node_modules/**",
+				"--glob=!**/.next/**",
+				"--glob=!**/dist/**",
+				"--glob=!**/build/**",
+				"--glob=!**/coverage/**",
+				"--glob=!**/.turbo/**",
+			}
+			if extra_args then
+				for _, arg in ipairs(extra_args) do
+					table.insert(args, arg)
+				end
+			end
+			return extend_vimgrep_args(args)
+		end
+
 		-- See `:help telescope.builtin`
 		local builtin = require("telescope.builtin")
 
@@ -172,7 +192,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
 							end
 							live_grep_args_with_history({
 								default_text = selection[1],
-								vimgrep_arguments = { extend_vimgrep_args({ "--hidden" }) },
+								vimgrep_arguments = extend_unignored_vimgrep_args(),
 							})
 						end
 
@@ -188,7 +208,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
 		vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
 		vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
 		vim.keymap.set("n", "<leader>sf", function()
-			builtin.find_files({ hidden = true })
+			builtin.find_files({ hidden = true, no_ignore = true })
 		end, { desc = "[S]earch [F]iles" })
 		vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
 		vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
@@ -226,42 +246,40 @@ return { -- Fuzzy Finder (files, lsp, etc)
 		-- Live grep w/ args extension configuration START --
 		vim.keymap.set("n", "<leader>fgg", function()
 			live_grep_args_with_history({
-				vimgrep_arguments = extend_vimgrep_args({
-					"--hidden",
-				}),
+				vimgrep_arguments = extend_unignored_vimgrep_args(),
 			})
 		end, { desc = "Live grep with args" })
 
 		vim.keymap.set("n", "<leader>fgw", function()
 			live_grep_args_with_history({
-				vimgrep_arguments = extend_vimgrep_args({ "-w", "--hidden" }),
+				vimgrep_arguments = extend_unignored_vimgrep_args({ "-w" }),
 			})
 		end, { desc = "Live grep with args (Match whole word)" })
 
 		vim.keymap.set("n", "<leader>fgs", function()
 			live_grep_args_with_history({
-				vimgrep_arguments = extend_vimgrep_args({ "-w", "-s", "--hidden" }),
+				vimgrep_arguments = extend_unignored_vimgrep_args({ "-w", "-s" }),
 			})
 		end, { desc = "Live grep with args (Match whole word & case)" })
 
 		vim.keymap.set("n", "<leader>fcc", function()
 			live_grep_args_with_history({
 				search_dirs = { vim.fn.expand("%:p") },
-				vimgrep_arguments = extend_vimgrep_args({ "--hidden" }),
+				vimgrep_arguments = extend_unignored_vimgrep_args(),
 			})
 		end, { desc = "Live Grep current file with args" })
 
 		vim.keymap.set("n", "<leader>fcw", function()
 			live_grep_args_with_history({
 				search_dirs = { vim.fn.expand("%:p") },
-				vimgrep_arguments = extend_vimgrep_args({ "-w", "--hidden" }),
+				vimgrep_arguments = extend_unignored_vimgrep_args({ "-w" }),
 			})
 		end, { desc = "Live Grep current file with args (Match whole word)" })
 
 		vim.keymap.set("n", "<leader>fcs", function()
 			live_grep_args_with_history({
 				search_dirs = { vim.fn.expand("%:p") },
-				vimgrep_arguments = extend_vimgrep_args({ "-w", "-s", "--hidden" }),
+				vimgrep_arguments = extend_unignored_vimgrep_args({ "-w", "-s" }),
 			})
 		end, { desc = "Live Grep current file with args (Match whole word & case)" })
 		-- Live grep args extension configuration END --
