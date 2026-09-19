@@ -146,6 +146,14 @@ return {
 		--   vim.diagnostic.config { signs = { text = diagnostic_signs } }
 		-- end
 
+		vim.diagnostic.config({
+			underline = true,
+			virtual_text = true,
+			signs = true,
+			severity_sort = true,
+			update_in_insert = false,
+		})
+
 		-- LSP servers and clients are able to communicate to each other what features they support.
 		--  By default, Neovim doesn't support everything that is in the LSP specification.
 		--  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -205,15 +213,74 @@ return {
 
 		-- Define servers with custom configurations
 		--
+		--
+
+		vim.lsp.config("ts_ls", {
+			filetypes = {
+				"javascript",
+				"javascriptreact",
+				"typescript",
+				"typescriptreact",
+				"vue",
+			},
+			init_options = {
+				plugins = {
+					{
+						name = "@vue/typescript-plugin",
+						location = vim.fn.stdpath("data")
+							.. "/mason/packages/vue-language-server/node_modules/@vue/language-server",
+						languages = { "vue" },
+					},
+				},
+			},
+		})
 
 		-- Go
 		vim.lsp.config("gopls", {
 			settings = {
 				gopls = {
-					-- gofumpt installed by Conform has issues so..
-					-- Enabling gofumpt here instead
+					analyses = {
+						-- Enabled analyzers for real-time linting
+						unusedparams = true,
+						shadow = true,
+						nilness = true,
+						unusedwrite = true,
+						useany = true,
+						fieldalignment = false, -- Can be noisy
+						fillreturns = true,
+						nonewvars = true,
+						undeclaredname = true,
+						unreachable = true,
+						unusedvariable = true,
+					},
+					staticcheck = true, -- Enables hundreds of checks from staticcheck.io
 					gofumpt = true,
 					usePlaceholders = true,
+					completeUnimported = true,
+					hints = {
+						assignVariableTypes = true,
+						compositeLiteralFields = true,
+						constantValues = true,
+						functionTypeParameters = true,
+						parameterNames = true,
+						rangeVariableTypes = true,
+					},
+				},
+			},
+		})
+
+		vim.lsp.config("vue_ls", {
+			filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
+			settings = {
+				vtsls = {
+					tsserver = {
+						globalPlugins = {
+							{
+								name = "@vue/typescript-plugin",
+								languages = { "vue" },
+							},
+						},
+					},
 				},
 			},
 		})
@@ -268,7 +335,14 @@ return {
 		})
 
 		local formatter_tools = collect_conform_formatters()
+		-- Add DAP adapters here to keep them synced with Mason (nvim-dap is already configured).
+		-- Adjust this list to match the languages you debug.
+		local dap_tools = {
+			"delve", -- Go
+		}
+
 		local tools_to_install = vim.list_extend(vim.deepcopy(lsp_servers), formatter_tools)
+		vim.list_extend(tools_to_install, dap_tools)
 
 		require("mason-tool-installer").setup({ ensure_installed = tools_to_install })
 

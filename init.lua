@@ -15,6 +15,7 @@ require("lazy").setup({
 	require("core.lspconfig"), -- Main LSP Config
 	-- require("themes.tokyonight"), -- Theme (from VS Code's TokyoNight)
 	require("themes.ondarkpro"), -- Theme (Atom's iconic One Dark theme)
+	require("plugins.nvim-dap"), --Debug Adapter Protocol (DAP)
 	require("plugins.lazydev"), -- Plugin manager
 	require("plugins.conform"), -- Autoformatting
 	require("plugins.nvim-cmp"), -- Autocompletion

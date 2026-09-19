@@ -113,6 +113,26 @@ return { -- Fuzzy Finder (files, lsp, etc)
 			return extend_vimgrep_args(args)
 		end
 
+		local function unignored_find_files_command()
+			return {
+				"rg",
+				"--files",
+				"--hidden",
+				"--no-ignore",
+				"--glob=!.git/*",
+				"--glob=!**/node_modules/**",
+				"--glob=!**/.next/**",
+				"--glob=!**/dist/**",
+				"--glob=!**/build/**",
+				"--glob=!**/coverage/**",
+				"--glob=!**/.turbo/**",
+			}
+		end
+
+		local function find_ignored_files()
+			require("telescope.builtin").find_files({ find_command = unignored_find_files_command() })
+		end
+
 		-- See `:help telescope.builtin`
 		local builtin = require("telescope.builtin")
 
@@ -208,8 +228,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
 		vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
 		vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
 		vim.keymap.set("n", "<leader>sf", function()
-			builtin.find_files({ hidden = true, no_ignore = true })
+			builtin.find_files({ hidden = true })
 		end, { desc = "[S]earch [F]iles" })
+		vim.keymap.set("n", "<leader>si", find_ignored_files, { desc = "[S]earch [I]gnored files" })
 		vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
 		vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
 		vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
