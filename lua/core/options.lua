@@ -18,6 +18,16 @@ vim.opt.showmode = true
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
 vim.schedule(function()
+	-- On WSL, talk to the Windows clipboard directly instead of relying on WSLg/Wayland
+	if vim.fn.has("wsl") == 1 then
+		local paste = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))'
+		vim.g.clipboard = {
+			name = "WslClipboard",
+			copy = { ["+"] = "clip.exe", ["*"] = "clip.exe" },
+			paste = { ["+"] = paste, ["*"] = paste },
+			cache_enabled = 0,
+		}
+	end
 	vim.opt.clipboard = "unnamedplus"
 end)
 
