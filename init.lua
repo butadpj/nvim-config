@@ -29,6 +29,7 @@ require("lazy").setup({
 	require("plugins.todo-comments"), -- Highlights TODO comments
 	require("plugins.markdown-preview"), -- Previewing .md files
 	require("plugins.dropbar"), -- IDE-like winbar with drop-down menus
+	require("plugins.testscope"), -- Sleek Terminal UI for viewing TS-written test cases
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	-- Multi cursor selection (Ctrl+D in VsCode)
 	{

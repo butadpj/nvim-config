@@ -20,10 +20,24 @@ vim.opt.showmode = true
 vim.schedule(function()
 	-- On WSL, talk to the Windows clipboard directly instead of relying on WSLg/Wayland
 	if vim.fn.has("wsl") == 1 then
-		local paste = 'powershell.exe -NoLogo -NoProfile -c [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))'
+		-- Force UTF-8 both ways; clip.exe mangles emoji and curly quotes
+		local copy = {
+			"powershell.exe",
+			"-NoLogo",
+			"-NoProfile",
+			"-c",
+			"[Console]::InputEncoding=[Text.Encoding]::UTF8; Set-Clipboard -Value ([Console]::In.ReadToEnd())",
+		}
+		local paste = {
+			"powershell.exe",
+			"-NoLogo",
+			"-NoProfile",
+			"-c",
+			'[Console]::OutputEncoding=[Text.Encoding]::UTF8; [Console]::Out.Write($(Get-Clipboard -Raw).tostring().replace("`r", ""))',
+		}
 		vim.g.clipboard = {
 			name = "WslClipboard",
-			copy = { ["+"] = "clip.exe", ["*"] = "clip.exe" },
+			copy = { ["+"] = copy, ["*"] = copy },
 			paste = { ["+"] = paste, ["*"] = paste },
 			cache_enabled = 0,
 		}
